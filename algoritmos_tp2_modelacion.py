@@ -1,5 +1,6 @@
+# SE REQUIEREN ESTAS BIBLIOTECAS PARA QUE
+# EL CODIGO FUNCIONE CORRECTAMENTE
 import matplotlib.pyplot as plt
-from tabulate import tabulate
 import numpy as np
 import math
 
@@ -14,45 +15,40 @@ limite_tn=24
 ############################
 
 def main():
-    solucion_paper = solucion_analitica(0.025)
-    rungekutta8 = resolucion_runge_kutta_4(8)
-    rungekutta9 = resolucion_runge_kutta_4(9)
-    rungekutta10 = resolucion_runge_kutta_4(10)
-    rungekutta11 = resolucion_runge_kutta_4(11)
-    rungekutta12 = resolucion_runge_kutta_4(12)
-    rungekutta13 = resolucion_runge_kutta_4(13)
-    rungekutta14 = resolucion_runge_kutta_4(14)
+    # AQUI EN EL MAIN SE PUEDEN PROBAR LOS DISTINTOS ALGORITMOS,
+    # VER SUS GRAFICOS, Y ESTIMAR ERRORES DE TRUNCAMIENTO
 
+    # EL METODO A UTILIZAR RECIBE COMO PARAMETRO EL PASO DE CALCULO
+    solucion_paper = solucion_analitica(0.025)
+    solucion_euler = resolucion_euler(4)
+    solucion_pc = resolucion_predictor_corrector(4)
+    solucion_rk4  = resolucion_runge_kutta_4(4)
+
+    # AGREGAR A ESTA LISTA DE SOLUCIONES, LAS SOLUCIONES A GRAFICAR
+    # CON EL NOMBRE, PASO DE CALCULO, LA SOLUCION, EL COLOR Y TRUE O FALSE PARA GRAFICAR LOS PUNTOS
     soluciones = [
         ("Solucion Paper", 0.025, solucion_paper, "black", False),
-        ("Runge-Kutta 4", 8, rungekutta8, "red", True),
-        ("Runge-Kutta 4", 9, rungekutta9, "green", True),
-        ("Runge-Kutta 4", 10, rungekutta10, "blue", True),
-        ("Runge-Kutta 4", 11, rungekutta11, "yellow", True),
-        ("Runge-Kutta 4", 12, rungekutta12, "purple", True),
-        ("Runge-Kutta 4", 13, rungekutta13, "violet", True),
-        ("Runge-Kutta 4", 14, rungekutta14, "orange", True),
-
+        ("Solucion Euler", 4, solucion_euler, "red", True),
+        ("Solucion P-C", 4, solucion_pc, "green", True),
+        ("Solucion RK4", 4, solucion_rk4, "blue", True),
     ]
-    errorrungekutta8 = calcular_errores_truncamiento(solucion_paper, rungekutta8)
-    errorrungekutta9 = calcular_errores_truncamiento(solucion_paper, rungekutta9)
-    errorrungekutta10 = calcular_errores_truncamiento(solucion_paper, rungekutta10)
-    errorrungekutta11 = calcular_errores_truncamiento(solucion_paper, rungekutta11)
-    errorrungekutta12 = calcular_errores_truncamiento(solucion_paper, rungekutta12)
-    errorrungekutta13 = calcular_errores_truncamiento(solucion_paper, rungekutta13)
-    errorrungekutta14 = calcular_errores_truncamiento(solucion_paper, rungekutta14)
+    
+    # LA FUNCION DE CALCULAR ERRORES DE TRUNCAMIENTO RECIBE DOS SOLUCIONES 
+    # PARA COMPARARLAS
+    error_euler = calcular_errores_truncamiento(solucion_paper, solucion_euler)
+    error_pc = calcular_errores_truncamiento(solucion_paper, solucion_pc)
+    error_rk4 = calcular_errores_truncamiento(solucion_paper, solucion_rk4)
 
-    graficar_soluciones(soluciones, 
-                        [
-                        ("Err trunc RK4(dx=8)", errorrungekutta8),
-                        ("Err trunc RK4(dx=9)", errorrungekutta9),
-                        ("Err trunc RK4(dx=10)", errorrungekutta10),
-                        ("Err trunc RK4(dx=11)", errorrungekutta11),
-                        ("Err trunc RK4(dx=12)", errorrungekutta12),
-                        ("Err trunc RK4(dx=13)", errorrungekutta13),
-                        ("Err trunc RK4(dx=14)", errorrungekutta14),
-                        ]
-                        )
+
+    # METER LOS ERRORES CALCULADOS EN ESTA LISTA, COMO UNA TUPLA CON
+    # EL NOMBRE DEL METODO Y EL PASO, Y LUEGO EL ERROR
+    errores = [("Err trunc Euler(dx=4)", error_euler),
+                ("Err trunc P-C(dx=4)", error_pc),
+                ("Err trunc RK4(dx=4)", error_rk4)
+            ]
+    
+
+    graficar_soluciones(soluciones, errores)
 
 def graficar_soluciones(lista_soluciones, errores):
     """
@@ -171,15 +167,5 @@ def calcular_errores_truncamiento(puntos_solucion_exacta, puntos_solucion_aproxi
             if punto1[0] == punto2[0]:
                 error_truncamiento += abs(punto1[1] - punto2[1])
     return error_truncamiento
-
-def mostrar_ultimas_iteraciones(tabla_alturas_iteraciones):
-    ultimos_diez = tabla_alturas_iteraciones[-10:]
-    tabla_formateada = tabulate(
-        ultimos_diez,
-        headers=["Iteración", "ECg"],
-        tablefmt="fancy_grid",
-        floatfmt=".6f"
-    )
-    print(tabla_formateada)
 
 main()
